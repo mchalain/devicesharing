@@ -1,2 +1,3 @@
-bin-y += main
+subdir-y += devicesharingd.mk
+subdir-y += devicesharing.mk
 

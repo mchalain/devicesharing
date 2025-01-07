@@ -2,6 +2,7 @@
 
 #include "daemonize.h"
 #include "log.h"
+#include "devicesharing.h"
 
 #define MODE_DAEMONIZE 0x0001
 
