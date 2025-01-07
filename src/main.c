@@ -3,6 +3,7 @@
 #include "daemonize.h"
 #include "log.h"
 #include "devicesharing.h"
+#include "unixsocket.h"
 
 #define MODE_DAEMONIZE 0x0001
 
@@ -25,12 +26,13 @@ int main(int argc, char * const argv[])
 	const char *configfile = NULL;
 	const char *logfile = "/var/log/"PACKAGE".log";
 	const char *workingdir = NULL;
+	const char *serverpath = "/var/run/"PACKAGE"_socket";
 	int mode = 0;
 
 	int opt;
 	do
 	{
-		opt = getopt(argc, argv, "hDL:W:P:U:");
+		opt = getopt(argc, argv, "hDL:W:P:U:f:");
 		switch (opt)
 		{
 			case 'h':
@@ -50,18 +52,27 @@ int main(int argc, char * const argv[])
 			case 'W':
 				workingdir = optarg;
 			break;
+			case 'f':
+				serverpath = optarg;
+			break;
 		}
 	} while(opt != -1);
 
 	if ((mode & MODE_DAEMONIZE) && daemonize(pidfile) == -1)
 		return 0;
 
+	server_t *server = server_create(serverpath, 10);
+	if (server == NULL)
+		return -1;
 	if (workingdir != NULL)
 		changeworkingdir(workingdir);
 	if (owner)
 		setprocessowner(owner);
 
+	server_run(server);
+
 	killdaemon(pidfile);
+	server_destroy(server);
 
 	return 0;
 }

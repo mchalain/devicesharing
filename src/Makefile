@@ -1,3 +1,3 @@
-subdir-y += devicesharingd.mk
 subdir-y += devicesharing.mk
+subdir-y += devicesharingd.mk
 
