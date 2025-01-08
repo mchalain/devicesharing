@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <sys/select.h>
 
+#ifndef UNIXSOCKET_PACKETSIZE
+#define UNIXSOCKET_PACKETSIZE 4200
+#endif
+
 typedef struct client_s client_t;
 typedef struct server_s server_t;
 

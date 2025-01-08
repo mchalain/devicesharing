@@ -50,7 +50,7 @@ int client_attach_receivefd(client_t *client, client_receivefd_t callback, void 
 ssize_t client_receive(client_t *client)
 {
 	ssize_t ret = -1;
-	char buffer[512];
+	char buffer[UNIXSOCKET_PACKETSIZE];
 
 	struct msghdr msg = {0};
 	struct iovec iov[1] = {{.iov_base = buffer, .iov_len = sizeof(*buffer)}};
@@ -61,7 +61,7 @@ ssize_t client_receive(client_t *client)
 	msg.msg_iov = iov;
 	msg.msg_iovlen = 1;
 
-	ret = recvmsg(client->sock, &msg, MSG_CMSG_CLOEXEC);
+	ret = recvmsg(client->sock, &msg, MSG_CMSG_CLOEXEC | MSG_WAITALL);
 	if (ret == -1)
 	{
 		warn("client: goodbye %p", client);
