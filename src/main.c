@@ -26,7 +26,7 @@ int main(int argc, char * const argv[])
 	const char *configfile = NULL;
 	const char *logfile = "/var/log/"PACKAGE".log";
 	const char *workingdir = NULL;
-	const char *serverpath = "/var/run/"PACKAGE"_socket";
+	const char *serverpath = "/tmp/"PACKAGE"_socket";
 	int mode = 0;
 
 	int opt;
@@ -62,6 +62,8 @@ int main(int argc, char * const argv[])
 		return 0;
 
 	server_t *server = server_create(serverpath, 10);
+	devicesharingd_t *ds = devicesharingd_create();
+
 	if (server == NULL)
 		return -1;
 	if (workingdir != NULL)
@@ -69,9 +71,13 @@ int main(int argc, char * const argv[])
 	if (owner)
 		setprocessowner(owner);
 
+	server_attach_receive(server, devicesharingd_receive_cb, ds);
+	server_attach_receivefd(server, devicesharingd_receivefd_cb, ds);
+
 	server_run(server);
 
 	killdaemon(pidfile);
+	devicesharingd_destroy(ds);
 	server_destroy(server);
 
 	return 0;
