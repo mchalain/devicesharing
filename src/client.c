@@ -53,7 +53,7 @@ ssize_t client_receive(client_t *client)
 	char buffer[UNIXSOCKET_PACKETSIZE];
 
 	struct msghdr msg = {0};
-	struct iovec iov[1] = {{.iov_base = buffer, .iov_len = sizeof(*buffer)}};
+	struct iovec iov[1] = {{.iov_base = buffer, .iov_len = UNIXSOCKET_PACKETSIZE}};
 	char ctrl_buf[CMSG_SPACE(sizeof(int))];
 
 	msg.msg_control = ctrl_buf;
@@ -61,8 +61,8 @@ ssize_t client_receive(client_t *client)
 	msg.msg_iov = iov;
 	msg.msg_iovlen = 1;
 
-	ret = recvmsg(client->sock, &msg, MSG_CMSG_CLOEXEC | MSG_WAITALL);
-	if (ret == -1)
+	ret = recvmsg(client->sock, &msg, MSG_CMSG_CLOEXEC);
+	if (ret < 1)
 	{
 		warn("client: goodbye %p", client);
 		return -1;
@@ -104,7 +104,9 @@ int client_wait(client_t *client, int maxfd, fd_set *rfds)
 
 ssize_t client_send(client_t *client, void *buffer, size_t length)
 {
-	return send(client->sock, buffer, length, MSG_DONTWAIT);
+	ssize_t ret = -1;
+	ret = send(client->sock, buffer, length, MSG_DONTWAIT);
+	return ret;
 }
 
 ssize_t client_sendfd(client_t *client, void *buffer, size_t length, int fd)
