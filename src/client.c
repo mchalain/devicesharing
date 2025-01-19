@@ -84,6 +84,13 @@ ssize_t client_receive(client_t *client)
 
 int client_wait(client_t *client, int maxfd, fd_set *rfds)
 {
+	fd_set srfds;
+	if (rfds == NULL)
+	{
+		FD_ZERO(&srfds);
+		rfds = &srfds;
+		maxfd = 0;
+	}
 	FD_SET(client->sock, rfds);
 	maxfd = (maxfd < client->sock)?client->sock:maxfd;
 
