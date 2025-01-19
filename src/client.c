@@ -116,6 +116,14 @@ ssize_t client_send(client_t *client, void *buffer, size_t length)
 	return ret;
 }
 
+int client_request(client_t *client, void *buffer, size_t length)
+{
+	ssize_t sended = client_send(client, buffer, length);
+	if (length == sended)
+		return client_wait(client, 0, NULL);
+	return -1;
+}
+
 ssize_t client_sendfd(client_t *client, void *buffer, size_t length, int fd)
 {
 	struct msghdr msg = {0};

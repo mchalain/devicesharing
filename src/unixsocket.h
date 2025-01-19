@@ -57,6 +57,7 @@ ssize_t client_sendfd(client_t *client, void *buffer, size_t length, int fd);
 
 ssize_t client_receive(client_t *client);
 int client_wait(client_t *client, int maxfd, fd_set *rfds);
+int client_request(client_t *client, void *buffer, size_t length);
 
 void client_destroy(client_t *client);
 
